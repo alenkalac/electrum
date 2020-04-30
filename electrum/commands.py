@@ -427,6 +427,20 @@ class Commands:
         return out['address']
 
     @command('n')
+    def getinfo(self):
+        """ network info """
+        net_params = self.network.get_parameters()
+        response = {
+            'blockchain_height': self.network.get_local_height(),
+            'server_height': self.network.get_server_height(),
+            'spv_nodes': len(self.network.get_interfaces()),
+            'connected': self.network.is_connected(),
+            'default_wallet': self.config.get_wallet_path(),
+            'fee_per_kb': self.config.fee_per_kb(),
+        }
+        return response
+
+    @command('n')
     def sweep(self, privkey, destination, fee=None, nocheck=False, imax=100):
         """Sweep private keys. Returns a transaction that spends UTXOs from
         privkey to a destination address. The transaction is not
@@ -511,7 +525,7 @@ class Commands:
             from .exchange_rate import FxThread
             fx = FxThread(self.config, None)
             kwargs['fx'] = fx
-        return json_encode(self.wallet.get_full_history(**kwargs))
+        return json_decode(json_encode(self.wallet.get_full_history(**kwargs)))
 
     @command('w')
     def setlabel(self, key, label):
