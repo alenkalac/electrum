@@ -684,6 +684,19 @@ class Commands:
         return self._format_request(out)
 
     @command('w')
+    def createnewtransaction(self, address, amount, memo='', expiration=None):
+        """Create a payment request, using provided address.
+        The address will be considered as used after this operation.
+        If no payment is received, the address will be considered as unused if the payment request is deleted from the wallet."""
+
+        amount = satoshis(amount)
+        expiration = int(expiration) if expiration else None
+        req = self.wallet.make_payment_request(address, amount, memo, expiration)
+        self.wallet.add_payment_request(req, self.config)
+        out = self.wallet.get_payment_request(address, self.config)
+        return self._format_request(out)
+
+    @command('w')
     def addtransaction(self, tx):
         """ Add a transaction to the wallet history """
         tx = Transaction(tx)
